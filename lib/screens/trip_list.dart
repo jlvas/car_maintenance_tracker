@@ -3,8 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import '../utilities/car_info.dart';
 import '../utilities/dataObject/car.dart';
 import '../utilities/file_manager.dart';
 
@@ -25,7 +23,6 @@ class _TripListState extends State<TripList> {
   LatLng startLocation = const LatLng(26.4568748, 50.0542238);
   LatLng endLocation = const LatLng(26.4568894, 50.0541741);
   Map<PolylineId, Polyline> polylines = {};
-  // late CarInfo carInfo;
   late Car car;
 
   @override
@@ -74,11 +71,9 @@ class _TripListState extends State<TripList> {
       width: 8,
     );
     polylines[id] = polyline;
-    // setState(() {});
   }
 
   Widget _tripList(){
-    log('toJson\n${car.toJson()}');
     return ListView.builder(
       itemCount:car.tripsInfo.length,
       itemBuilder: ((_, index){
@@ -104,7 +99,7 @@ class _TripListState extends State<TripList> {
                 Divider(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Total Distance: ${car.tripsInfo[index].totalDistance}'),
+                  child: Text('Total Distance: ${car.tripsInfo[index].totalDistance} km'),
                 ),
                 Divider(),
                 Expanded(
@@ -123,19 +118,15 @@ class _TripListState extends State<TripList> {
 
   Future<String> _initialize() async{
     log('_initialize()');
-    // String content = await FileManager().readFromFile();
     String contentCar = await FileManager().readFromFileCar();
     log(contentCar.toString());
     if( contentCar == 'data'){
       log('_initialize: $contentCar');
       return contentCar;
     }else{
-      // final Map<String, dynamic> valueMap = json.decode(content);
 
-      // carInfo = CarInfo.fromJson(valueMap);
       car = Car.fromJson(json.decode(contentCar));
 
-      // log('_initialize: $content');
       log('_initialize\n$contentCar');
 
       return contentCar;
@@ -143,8 +134,6 @@ class _TripListState extends State<TripList> {
   }
 
   Widget _googleMap(){
-    // carInfo.coordinates.forEach((element) {log('Coordinates: $element');});
-    // _addPolyLine(carInfo.coordinates);
     _addPolyLine(car.tripsInfo[0].trip);
     _setEndMarker();
     _setStartMarker();
@@ -210,47 +199,3 @@ class _TripListState extends State<TripList> {
     ));
   }
 }
-
-// Widget _tripList(){
-//   log('toJson\n${carInfo.toJson()}');
-//   return ListView.builder(
-//     itemCount:carInfo.tripList.length,
-//     itemBuilder: ((_, index){
-//       _addPolyLine(carInfo.tripList[index]);
-//       return SizedBox(
-//         height: 400,
-//         child: Container(
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(10),
-//             border: Border.all(
-//               width: 10,
-//               color: Colors.black26,
-//             ),
-//           ),
-//           margin: const EdgeInsets.all(15.0),
-//           padding: const EdgeInsets.only(top: 8.0),
-//           child: Column(
-//             children: [
-//               Padding(
-//                 padding: const EdgeInsets.all(8.0),
-//                 child: Text('Trip Time: $index'),
-//               ),
-//               Divider(),
-//               Padding(
-//                 padding: const EdgeInsets.all(8.0),
-//                 child: Text('Total Distance: ######'),
-//               ),
-//               Divider(),
-//               Expanded(
-//                 child: Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: _googleMap(),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       );
-//     }),
-//   );
-// }

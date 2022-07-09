@@ -3,9 +3,6 @@ import 'package:current_location/screens/edit_car_info.dart';
 import 'package:current_location/utilities/display_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'dart:io';
-import '../utilities/car_info.dart';
-import '../utilities/file_manager.dart';
 
 import 'dart:developer';
 
@@ -18,7 +15,6 @@ class BluetoothDevicesList extends StatefulWidget {
 
 class _BluetoothDevicesListState extends State<BluetoothDevicesList> {
   Timer? timer;
-  CarInfo? carInfo;
   StreamSubscription? _subscription;
   List<BluetoothDevice> deviceList = [];
 

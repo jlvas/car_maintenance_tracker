@@ -1,9 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-
-import '../utilities/car_info.dart';
 import '../utilities/dataObject/car.dart';
 import '../utilities/file_manager.dart';
 import 'main_screen.dart';
@@ -28,13 +25,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
   final TextEditingController _carMileage = TextEditingController();
 
   Future<void> _submitCarInfo() async{
-    // final  carInfo = CarInfo(
-    //   bluetoothAddress: _bluetoothAddress,// for now only
-    //   carCompany: _carCompany.text,
-    //   carName: _carName.text,
-    //   carYear: _carYear.text,
-    //   carMileage: _carMileage.text,
-    // );
+
     final car = Car(
       bluetoothAddress: _bluetoothAddress,
       carCompany: _carCompany.text,
@@ -51,33 +42,9 @@ class _EditCarInfoState extends State<EditCarInfo> {
       ),
           (route) => false,
     );
-    // Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  // Future<void> _readFile() async{
-  //   try{
-  //     CarInfo carInfo =
-  //     await FileControl().readFromFileCarInfo();
-  //     print(carInfo.toJson());
-  //   }
-  //   catch(e){
-  //     showDialog(
-  //       context: context,
-  //       builder: (ctx){
-  //         return AlertDialog(
-  //           title: Text('File Reading issue'),
-  //           content: Text('Error: $e'),
-  //           actions: [TextButton(
-  //             onPressed:(){
-  //               Navigator.of(ctx).pop();
-  //             },
-  //             child: Text('OK'),
-  //           )],
-  //         );
-  //       }
-  //     );
-  //   }
-  // }
+
   @override
   Widget build(BuildContext context) {
 

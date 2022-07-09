@@ -11,7 +11,6 @@ import 'package:location/location.dart';
 
 import '../utilities/dataObject/car.dart';
 import '../utilities/file_manager.dart';
-import '../utilities/car_info.dart';
 import '../utilities/display_message.dart';
 import 'trip_list.dart';
 
@@ -25,7 +24,6 @@ class CarTracking extends StatefulWidget {
 }
 
 class _CarTrackingState extends State<CarTracking> {
-  // late CarInfo carInfo;
   late Car car;
 
   String? longitude;

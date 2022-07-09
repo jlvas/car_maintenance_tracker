@@ -3,9 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:developer';
 
-import 'car_info.dart';
 import 'dataObject/car.dart';
-import 'location_info.dart';
 
 class FileManager {
   static final FileManager _fileManager = FileManager._internal();
@@ -84,35 +82,12 @@ class FileManager {
     return contents;
   }
 
-  Future<void> writeToFile (CarInfo carInfo) async{
-    try{
-      carInfo.coordinates.map((e) => print('writeToFile: $e'));
-      final file = await _file;
-      // log('\nFileManager\n writeToFileCarInfo()\n ${json.encode(carInfo.toJson())}');
-      await file.writeAsString(
-        json.encode(carInfo.toJson())+'\n',
-        mode: FileMode.write,
-        encoding: utf8,
-        flush: true,
-      );
-    }
-    catch (e){
-      log('FileManager.writeToFile (CarInfo carInfo)\n $e');
-      throw e;
-    }
-  }
 
   Future<void> writeCarToFile (Car car) async{
     try{
       final file = await _fileCar;
       log('FileManager.writeToFileCarInfo\n ${json.encode(car.toJson())}');
-      await file.writeAsString(json.encode(car.toJson()));
-      // await file.writeAsString(
-      //   json.encode(car.toJson()),
-      //   mode: FileMode.write,
-      //   encoding: utf8,
-      //   flush: false,
-      // );
+      await file.writeAsString(json.encode(car.toJson()),flush: true);
     }
     catch (e){
       log('FileManager.writeToFileCarInfo.error\n $e');
