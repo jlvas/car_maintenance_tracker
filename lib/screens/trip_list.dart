@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../utilities/dataObject/car.dart';
+import 'package:provider/provider.dart';
+import '../utilities/dataObject/trips_info.dart';
+import '../utilities/file_controller.dart';
 import '../utilities/file_manager.dart';
 
 class TripList extends StatefulWidget {
@@ -23,42 +25,47 @@ class _TripListState extends State<TripList> {
   LatLng startLocation = const LatLng(26.4568748, 50.0542238);
   LatLng endLocation = const LatLng(26.4568894, 50.0541741);
   Map<PolylineId, Polyline> polylines = {};
-  late Car car;
+  // late Car car;
+  late FileController fileController;
 
   @override
   Widget build(BuildContext context){
-    log('TripList');
+    fileController = Provider.of<FileController>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trip List'),
       ),
-      body: FutureBuilder<String>(
-        future: _initialize(),
-        builder: (context, snapShat){
-          if(snapShat.hasData){
-            log('TripList hasData');
-            if(snapShat.data == 'data'){
-              log('data == data');
-              return const Text('has data');
-            }else{
-              log('_tripList()\n${snapShat.data}');
-              return _tripList();
-            }
+      body: _tripList(),
+    );
+  }
+
+  FutureBuilder<String> buildFutureBuilder() {
+    return FutureBuilder<String>(
+      future: _initialize(),
+      builder: (context, snapShat){
+        if(snapShat.hasData){
+          log('TripList hasData');
+          if(snapShat.data == 'data'){
+            log('data == data');
+            return const Text('has data');
+          }else{
+            log('_tripList()\n${snapShat.data}');
+            return _tripList();
           }
-          else if(snapShat.connectionState == ConnectionState.waiting){
-            return const Text('Waiting');
-          }
-          else if(snapShat.hasError){
-            log('hasError: ${snapShat.data.toString()}\n${snapShat.hasError}\n${snapShat.error}');
-            return Text('Error: ${snapShat.hasError}\n${snapShat.error}');
-          }
-          else{
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      )
+        }
+        else if(snapShat.connectionState == ConnectionState.waiting){
+          return const Text('Waiting');
+        }
+        else if(snapShat.hasError){
+          log('hasError: ${snapShat.data.toString()}\n${snapShat.hasError}\n${snapShat.error}');
+          return Text('Error: ${snapShat.hasError}\n${snapShat.error}');
+        }
+        else{
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 
@@ -74,10 +81,11 @@ class _TripListState extends State<TripList> {
   }
 
   Widget _tripList(){
+
     return ListView.builder(
-      itemCount:car.tripsInfo.length,
+      itemCount:fileController.car.tripsInfo.length,
       itemBuilder: ((_, index){
-        _addPolyLine(car.tripsInfo[index].trip);
+        _addPolyLine(fileController.car.tripsInfo[index].trip);
         return SizedBox(
           height: 400,
           child: Container(
@@ -94,18 +102,18 @@ class _TripListState extends State<TripList> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Trip Time: ${car.tripsInfo[index].time}'),
+                  child: Text('Trip Time: ${fileController.car.tripsInfo[index].time}'),
                 ),
                 Divider(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Total Distance: ${car.tripsInfo[index].totalDistance} km'),
+                  child: Text('Total Distance: ${fileController.car.tripsInfo[index].totalDistance} km'),
                 ),
                 Divider(),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: _googleMap(),
+                    child: _googleMap(fileController.car.tripsInfo[index].trip),
                   ),
                 ),
               ],
@@ -125,7 +133,7 @@ class _TripListState extends State<TripList> {
       return contentCar;
     }else{
 
-      car = Car.fromJson(json.decode(contentCar));
+      // car = Car.fromJson(json.decode(contentCar));
 
       log('_initialize\n$contentCar');
 
@@ -133,10 +141,10 @@ class _TripListState extends State<TripList> {
     }
   }
 
-  Widget _googleMap(){
-    _addPolyLine(car.tripsInfo[0].trip);
-    _setEndMarker();
-    _setStartMarker();
+  Widget _googleMap(List<LatLng> trip){
+    _addPolyLine(trip);
+    _setEndMarker(trip);
+    _setStartMarker(trip);
       return GoogleMap(
         zoomGesturesEnabled: true,
         initialCameraPosition: CameraPosition(
@@ -170,8 +178,8 @@ class _TripListState extends State<TripList> {
     });
   }
 
-  void _setStartMarker() {
-    startLocation = car.tripsInfo[0].trip[0];
+  void _setStartMarker(List<LatLng> list) {
+    startLocation = list.first;
     markers.add(Marker(
       markerId: MarkerId(startLocation.toString()),
       position: startLocation, //position of marker
@@ -184,8 +192,8 @@ class _TripListState extends State<TripList> {
     ));
   }
 
-  void _setEndMarker() {
-    endLocation = car.tripsInfo[0].trip.last;
+  void _setEndMarker(List<LatLng> trip) {
+    endLocation = trip.last;
     markers.add(Marker(
       //add distination location marker
       markerId: MarkerId(endLocation.toString()),

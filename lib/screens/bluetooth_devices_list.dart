@@ -45,6 +45,7 @@ class _BluetoothDevicesListState extends State<BluetoothDevicesList> {
 
   @override
   Widget build(BuildContext context) {
+
     log('BluetoothDeviceList build()');
     return Scaffold(
       appBar: AppBar(

@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utilities/dataObject/car.dart';
+import '../utilities/file_controller.dart';
 import '../utilities/file_manager.dart';
 import 'main_screen.dart';
 
@@ -24,6 +26,8 @@ class _EditCarInfoState extends State<EditCarInfo> {
   final TextEditingController _carYear = TextEditingController();
   final TextEditingController _carMileage = TextEditingController();
 
+  late FileController fileController;
+
   Future<void> _submitCarInfo() async{
 
     final car = Car(
@@ -33,7 +37,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
       carName: _carName.text,
       carYear: _carYear.text, tripsInfo: [],
     );
-    // await FileManager().writeToFile(carInfo);
+    fileController.writeCar(car);// using change notifier provider
     await FileManager().writeCarToFile(car);
     Navigator.pushAndRemoveUntil(
       context,
@@ -49,6 +53,8 @@ class _EditCarInfoState extends State<EditCarInfo> {
   Widget build(BuildContext context) {
 
     _bluetoothAddress = ModalRoute.of(context)!.settings.arguments as String;
+    fileController = Provider.of<FileController>(context);
+
     return Scaffold(
       appBar:AppBar(
         title: const Text('Edit Car Info'),

@@ -45,6 +45,7 @@ class FileManager {
   // }
 
   Future<String> readFromFile() async {
+    log('FileManager.readFromFile');
     File file = await _file;
     String contents = 'data';
     // log('\nFileManager\nreadFromFile()\n $contents');

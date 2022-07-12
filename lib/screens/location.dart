@@ -4,10 +4,12 @@ import 'dart:math';
 import 'dart:developer' as developer;
 
 import 'package:current_location/utilities/dataObject/trips_info.dart';
+import 'package:current_location/utilities/file_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 
 import '../utilities/dataObject/car.dart';
 import '../utilities/file_manager.dart';
@@ -24,7 +26,6 @@ class CarTracking extends StatefulWidget {
 }
 
 class _CarTrackingState extends State<CarTracking> {
-  late Car car;
 
   String? longitude;
   String? latitude;
@@ -38,6 +39,8 @@ class _CarTrackingState extends State<CarTracking> {
   LatLng endLocation = const LatLng(26.4568894, 50.0541741);
   Map<PolylineId, Polyline> polylines = {};
 
+  late FileController fileController;
+
   @override
   void initState() {
     Location().enableBackgroundMode(enable: true);
@@ -45,38 +48,43 @@ class _CarTrackingState extends State<CarTracking> {
 
   @override
   Widget build(BuildContext context) {
+    _getGPSstreamLocation();
+
+    fileController = Provider.of<FileController>(context,listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Live Location'),
       ),
-      body: FutureBuilder<String>(
-          future: _getCarInfo(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return _interfaceWidget();
-            } else if (snapshot.hasError) {
-              developer.log('CartTracking: has error: ${snapshot.data}');
-              return Text('has Error: \n${snapshot.error}');
-            } else {
-              developer.log('\nCarTracking\nCircularProgressIndicator');
-              return const CircularProgressIndicator();
-            }
-          }),
+      body: _interfaceWidget(),
     );
   }
+
+  // FutureBuilder<String> buildFutureBuilder() {
+  //   return FutureBuilder<String>(
+  //       future: _getCarInfo(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.hasData) {
+  //           return _interfaceWidget();
+  //         } else if (snapshot.hasError) {
+  //           developer.log('CartTracking: has error: ${snapshot.data}');
+  //           return Text('has Error: \n${snapshot.error}');
+  //         } else {
+  //           developer.log('\nCarTracking\nCircularProgressIndicator');
+  //           return const CircularProgressIndicator();
+  //         }
+  //       });
+  // }
 
 
    ///_gerGPSstream: a function get gps coordinates when device is connected with chosen specific bluetooth.
   ///Contains: two streams; one to listen for bluetooth connection and second one is to write down the GPS coordinates.
   ///Data is stored on CarInfo and then will be written on json file.
-  void _getGPSstreamLocation() async {
+  void _getGPSstreamLocation() {
 
-    developer.log('\nCarTracking\n_getGPSstreamLocation()');
+    developer.log('CarTracking._getGPSstreamLocation()');
 
     Timer timer;
     StreamSubscription? streamLocation;
-    StreamSubscription? streamBluetooth;
-    StreamController blueConnection = StreamController<BluetoothDevice>();;
     BluetoothDevice? bDevice;
 
     ///TripInfo properties
@@ -93,22 +101,20 @@ class _CarTrackingState extends State<CarTracking> {
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       FlutterBluetoothSerial.instance.getBondedDevices().then((value){
-            bDevice = value.where((element){
-              return element.address == car.bluetoothAddress;
+            return bDevice = value.where((element){
+              return element.address == fileController.car.bluetoothAddress;
             }).first;
           });
       if(!bDevice!.isConnected){
-
-        time = DateTime.now().toString();
-        totalDistance = _getDistance(trip).toString();
-        car.tripsInfo.add(TripsInfo(trip: trip, time: time, totalDistance: totalDistance));
-        developer.log('Car toJson:\n${car.toJson()}');
-
-        // FileManager().writeToFile(carInfo);
-        FileManager().writeCarToFile(car);
-
         streamLocation?.cancel();
         timer.cancel();
+        time = DateTime.now().toString();
+        totalDistance = _getDistance(trip).toString();
+        fileController.car.tripsInfo.add(TripsInfo(trip: trip, time: time, totalDistance: totalDistance));
+        fileController.write();
+        developer.log('Details:\n${jsonEncode(fileController.car.toJson())}');
+        // FileManager().writeCarToFile(car);
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -213,44 +219,18 @@ class _CarTrackingState extends State<CarTracking> {
   }
 
   Future<String> _getCarInfo() async {
-
-    // String content = await FileManager().readFromFile();
     String contentCar = await FileManager().readFromFileCar();
-
-    // developer.log('\nCarTraking\n_getCarInfo()\n$content');
-    developer.log('\nCarTraking\n_getCarInfo()\n$contentCar');
-
-    // carInfo = CarInfo.fromJson(json.decode(content));
-    car = Car.fromJson(json.decode(contentCar));
-    developer.log('Done _getCarInfo()');
+    developer.log('CarTraking._getCarInfo()\n$contentCar');
     return contentCar;
   }
 
   Widget _interfaceWidget() {
-    _getGPSstreamLocation();
-
-    ///start streaming gps
     return Center(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // carInfo.isBluetoothConnected()
-            //     ? Row(
-            //         mainAxisAlignment: MainAxisAlignment.center,
-            //         children: [
-            //           Text('${carInfo.bluetoothDevice.name}: '),
-            //           const Icon(Icons.bluetooth_connected, color: Colors.blue),
-            //         ],
-            //       )
-            //     : Row(
-            //         mainAxisAlignment: MainAxisAlignment.center,
-            //         children: [
-            //           Text('${carInfo.bluetoothDevice.name}: '),
-            //           const Icon(Icons.bluetooth_disabled_rounded),
-            //         ],
-            //       ),
             const Divider(
               height: 20,
             ),
@@ -290,7 +270,7 @@ class _CarTrackingState extends State<CarTracking> {
                 ElevatedButton(
                   child: const Text('r'),
                   onPressed: ()async{
-                    await FileManager().writeCarToFile(car);
+                    await fileController.writeCar(fileController.car);
                   },
                 ),
                 //Stream
@@ -342,7 +322,7 @@ class _CarTrackingState extends State<CarTracking> {
                     // CameraPosition cameraPosition = CameraPosition(target: showLocation, zoom: 40);
                     CameraUpdate cameraUpdate =
                         CameraUpdate.newLatLng(showLocation);
-                    print('current location ${showLocation.toString()}');
+                    developer.log('current location ${showLocation.toString()}');
                     _googleMapController!.animateCamera(cameraUpdate);
                   },
                   child: const Icon(Icons.my_location),
