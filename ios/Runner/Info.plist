@@ -52,5 +52,7 @@
       <!-- additionally for iOS 9/10, if you need always permission -->
       <key>NSLocationAlwaysUsageDescription</key>
       <string>Reason why app needs location</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>

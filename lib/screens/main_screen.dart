@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
             return const BluetoothDevicesList();
           }else{
             log('MainScrenn.CarTracking()\nData:${dataSnap.data}\nhad data: dataSnap.hasData\nhas error:${dataSnap.hasError}\n${dataSnap.error}');
-            Provider.of<FileController>(context).readCar();
+            Provider.of<FileController>(context, listen: false).readCar();
             return const CarTracking();
           }
         } else {

@@ -11,7 +11,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
-import '../utilities/dataObject/car.dart';
 import '../utilities/file_manager.dart';
 import '../utilities/display_message.dart';
 import 'trip_list.dart';
@@ -41,16 +40,15 @@ class _CarTrackingState extends State<CarTracking> {
 
   late FileController fileController;
 
-  @override
-  void initState() {
-    Location().enableBackgroundMode(enable: true);
-  }
+  // @override
+  // void initState() {
+  //   Location().enableBackgroundMode(enable: true);
+  // }
 
   @override
   Widget build(BuildContext context) {
-    _getGPSstreamLocation();
-
     fileController = Provider.of<FileController>(context,listen: false);
+    _getGPSstreamLocation();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Live Location'),
@@ -59,23 +57,6 @@ class _CarTrackingState extends State<CarTracking> {
     );
   }
 
-  // FutureBuilder<String> buildFutureBuilder() {
-  //   return FutureBuilder<String>(
-  //       future: _getCarInfo(),
-  //       builder: (context, snapshot) {
-  //         if (snapshot.hasData) {
-  //           return _interfaceWidget();
-  //         } else if (snapshot.hasError) {
-  //           developer.log('CartTracking: has error: ${snapshot.data}');
-  //           return Text('has Error: \n${snapshot.error}');
-  //         } else {
-  //           developer.log('\nCarTracking\nCircularProgressIndicator');
-  //           return const CircularProgressIndicator();
-  //         }
-  //       });
-  // }
-
-
    ///_gerGPSstream: a function get gps coordinates when device is connected with chosen specific bluetooth.
   ///Contains: two streams; one to listen for bluetooth connection and second one is to write down the GPS coordinates.
   ///Data is stored on CarInfo and then will be written on json file.
@@ -83,13 +64,12 @@ class _CarTrackingState extends State<CarTracking> {
 
     developer.log('CarTracking._getGPSstreamLocation()');
 
-    Timer timer;
     StreamSubscription? streamLocation;
     BluetoothDevice? bDevice;
 
     ///TripInfo properties
     List<LatLng> trip= [];
-    String time;
+    String time = DateTime.now().toString();
     String totalDistance;
 
     streamLocation = Location().onLocationChanged.listen((lnglat) {
@@ -99,7 +79,7 @@ class _CarTrackingState extends State<CarTracking> {
       developer.log('\ncoordinates added: $coordinate');
     });
 
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
       FlutterBluetoothSerial.instance.getBondedDevices().then((value){
             return bDevice = value.where((element){
               return element.address == fileController.car.bluetoothAddress;
@@ -108,20 +88,19 @@ class _CarTrackingState extends State<CarTracking> {
       if(!bDevice!.isConnected){
         streamLocation?.cancel();
         timer.cancel();
-        time = DateTime.now().toString();
         totalDistance = _getDistance(trip).toString();
         fileController.car.tripsInfo.add(TripsInfo(trip: trip, time: time, totalDistance: totalDistance));
         fileController.write();
         developer.log('Details:\n${jsonEncode(fileController.car.toJson())}');
         // FileManager().writeCarToFile(car);
-
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => const TripList(),
-          ),
-              (route) => false,
-        );
+        // Navigator.pushNamedAndRemoveUntil(context, TripList.routeName, (route) => false);
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => const TripList(),
+        //   ),
+        //       (route) => false,
+        // );
       }
     });
   }
@@ -216,12 +195,6 @@ class _CarTrackingState extends State<CarTracking> {
         cos((lat2 - lat1) * p) / 2 +
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
-  }
-
-  Future<String> _getCarInfo() async {
-    String contentCar = await FileManager().readFromFileCar();
-    developer.log('CarTraking._getCarInfo()\n$contentCar');
-    return contentCar;
   }
 
   Widget _interfaceWidget() {
@@ -361,3 +334,9 @@ class _CarTrackingState extends State<CarTracking> {
     );
   }
 }
+
+// Future<String> _getCarInfo() async {
+//   String contentCar = await FileManager().readFromFileCar();
+//   developer.log('CarTraking._getCarInfo()\n$contentCar');
+//   return contentCar;
+// }
