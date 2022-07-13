@@ -7,7 +7,7 @@ import 'package:current_location/utilities/file_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './screens/bluetooth_devices_list.dart';
-import 'screens/location.dart';
+import 'screens/car_tracking.dart';
 
 import 'dart:developer';
 
@@ -28,11 +28,11 @@ class MyApp extends StatelessWidget {
         ),
         home: const MainScreen(),
         routes: {
-          BluetoothDevicesList.routeName: (ctx) => BluetoothDevicesList(),
-          EditCarInfo.routeName: (ctx) => EditCarInfo(),
-          CarTracking.routeName: (ctx) => CarTracking(),
-          MainScreen.routeName:(ctx) => MainScreen(),
-          TripList.routeName:(ctx) => TripList(),
+          BluetoothDevicesList.routeName: (ctx) => const BluetoothDevicesList(),
+          EditCarInfo.routeName: (ctx) => const EditCarInfo(),
+          CarTracking.routeName: (ctx) => const CarTracking(),
+          MainScreen.routeName:(ctx) => const MainScreen(),
+          TripList.routeName:(ctx) => const TripList(),
         },
       ),
     );

@@ -1,12 +1,7 @@
 import 'dart:developer';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:current_location/utilities/dataObject/trips_info.dart';
-//
 
-//
-@JsonSerializable(explicitToJson: true)
 class Car{
 
   late String bluetoothAddress;
