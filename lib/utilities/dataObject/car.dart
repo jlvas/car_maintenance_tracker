@@ -1,26 +1,26 @@
 import 'dart:developer';
 
 import 'package:current_location/utilities/dataObject/trips_info.dart';
+import 'services.dart';
 
 class Car{
 
-  late String bluetoothAddress;
-  late String carName;
-  late String carYear;
-  late String carCompany;
-  late String carMileage;
-  List<TripsInfo> tripsInfo =[];
+  final String bluetoothAddress;
+  final String carName;
+  final String carYear;
+  final String carCompany;
+  final String carMileage;
+  final List<TripsInfo> tripsInfo;
+  final List<Services> serviceList;
 
 
-  Car(
-      {required this.bluetoothAddress,
+  Car({required this.bluetoothAddress,
       required this.carName,
       required this.carYear,
       required this.carCompany,
       required this.carMileage,
-      required this.tripsInfo});
-
-
+      required this.tripsInfo,
+      required this.serviceList});
 
   factory Car.fromJson(Map<String,dynamic> json) => Car(
     bluetoothAddress: json['bluetoothAddress'],
@@ -30,6 +30,9 @@ class Car{
     carMileage: json['carMileage'],
     tripsInfo: (json['tripsInfo'] as List<dynamic>)
         .map((e) => TripsInfo.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    serviceList: (json['serviceList'] as List<dynamic>)
+        .map((e) => Services.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 
@@ -41,5 +44,6 @@ class Car{
         'carCompany': carCompany,
         'carMileage': carMileage,
         'tripsInfo': tripsInfo.map((e) => e.toJson()).toList(),
+        'serviceList':serviceList.map((e) => e.toJson()).toList(),
       };
 }

@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:current_location/screens/alert_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../utilities/dataObject/trips_info.dart';
 import '../utilities/file_controller.dart';
 import '../utilities/file_manager.dart';
+import 'add_alert.dart';
 
 class TripList extends StatefulWidget {
   static const routeName = '/screens/trip_list';
@@ -34,22 +36,53 @@ class _TripListState extends State<TripList> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trip List'),
+        actions: [
+          PopupMenuButton<int>(
+            onSelected: (item)=> _onSelectedMenu(context, item),
+            itemBuilder: (context){
+              return [
+                const PopupMenuItem<int>(
+                  value: 0,
+                  child: Text('Edit Car Info'),
+                ),
+                const PopupMenuItem<int>(
+                  value: 1,
+                  child: Text('Add Alert'),
+                ),
+                const PopupMenuItem<int>(
+                  value: 2,
+                  child: Text('Alert List'),
+                )
+              ];
+            },
+          )
+        ],
       ),
       body: _tripList(),
     );
   }
 
+  void _onSelectedMenu(BuildContext context, int item){
+    switch(item) {
+      case 0:
+        print('pressed on value 0');
+        break;
+      case 1:
+        Navigator.pushNamed(context, AddAlert.routeName);
+        break;
+      case 2:
+        Navigator.pushNamed(context, CarHistory.routeName);
+        break;
+    }
+  }
   FutureBuilder<String> buildFutureBuilder() {
     return FutureBuilder<String>(
       future: _initialize(),
       builder: (context, snapShat){
         if(snapShat.hasData){
-          log('TripList hasData');
           if(snapShat.data == 'data'){
-            log('data == data');
             return const Text('has data');
           }else{
-            log('_tripList()\n${snapShat.data}');
             return _tripList();
           }
         }
@@ -57,7 +90,6 @@ class _TripListState extends State<TripList> {
           return const Text('Waiting');
         }
         else if(snapShat.hasError){
-          log('hasError: ${snapShat.data.toString()}\n${snapShat.hasError}\n${snapShat.error}');
           return Text('Error: ${snapShat.hasError}\n${snapShat.error}');
         }
         else{
