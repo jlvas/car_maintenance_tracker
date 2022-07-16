@@ -29,7 +29,6 @@ class _BluetoothDevicesListState extends State<BluetoothDevicesList> {
   ///It checks every one second
   @override
   void initState() {
-    log('BluetoothDeviceList initState()');
     super.initState();
     timer = Timer.periodic(
         const Duration(seconds: 1), (Timer t) => showDeviceList());
@@ -46,7 +45,6 @@ class _BluetoothDevicesListState extends State<BluetoothDevicesList> {
   @override
   Widget build(BuildContext context) {
 
-    log('BluetoothDeviceList build()');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bluetooth'),
@@ -78,18 +76,21 @@ class _BluetoothDevicesListState extends State<BluetoothDevicesList> {
                                   )
                                 : const Icon(Icons.bluetooth_disabled_rounded),
                             onTap: () async {
-                              if (deviceList[index].isConnected) {
+                              if (deviceList[index].isConnected)
+                              {
                                 timer?.cancel();
                                 await Navigator.pushNamed(
                                   context,
                                   EditCarInfo.routeName,
                                   arguments: deviceList[index].address,
                                 );
-                              } else {
+                              }
+                              else
+                              {
                                 DisplayMessage().showMessage(
-                                    'Pair the device first',
+                                    'Connection Issue',
                                     context,
-                                    'Connection issue');
+                                    'Pair the device first');
                               }
                             },
                           );

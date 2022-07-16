@@ -1,13 +1,15 @@
-import 'package:current_location/screens/bluetooth_devices_list.dart';
-import 'package:current_location/screens/edit_car_info.dart';
-import 'package:current_location/screens/main_screen.dart';
-import 'package:current_location/screens/trip_list.dart';
-import 'package:current_location/utilities/file_controller.dart';
-import 'package:current_location/utilities/file_manager.dart';
+import 'screens/bluetooth_devices_list.dart';
+import 'screens/edit_car_info.dart';
+import 'screens/main_screen.dart';
+import 'screens/trip_list.dart';
+import 'screens/add_alert.dart';
+import 'screens/car_history.dart';
+import 'screens/car_tracking.dart';
+import 'utilities/file_controller.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import './screens/bluetooth_devices_list.dart';
-import 'screens/car_tracking.dart';
+
 
 import 'dart:developer';
 
@@ -33,6 +35,8 @@ class MyApp extends StatelessWidget {
           CarTracking.routeName: (ctx) => const CarTracking(),
           MainScreen.routeName:(ctx) => const MainScreen(),
           TripList.routeName:(ctx) => const TripList(),
+          AddAlert.routeName: (ctx) => const AddAlert(),
+          CarHistory.routeName: (ctx) => const CarHistory(),
         },
       ),
     );

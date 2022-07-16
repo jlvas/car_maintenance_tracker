@@ -35,10 +35,12 @@ class _EditCarInfoState extends State<EditCarInfo> {
       carCompany: _carCompany.text,
       carMileage: _carName.text,
       carName: _carName.text,
-      carYear: _carYear.text, tripsInfo: [],
+      carYear: _carYear.text,
+      tripsInfo: [],
+      serviceList: [],
     );
     fileController.writeCar(car);// using change notifier provider
-    await FileManager().writeCarToFile(car);
+    // await FileManager().writeCarToFile(car);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
