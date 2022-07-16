@@ -3,7 +3,7 @@ import 'screens/edit_car_info.dart';
 import 'screens/main_screen.dart';
 import 'screens/trip_list.dart';
 import 'screens/add_alert.dart';
-import 'screens/car_history.dart';
+import 'screens/alert_list.dart';
 import 'screens/car_tracking.dart';
 import 'utilities/file_controller.dart';
 
