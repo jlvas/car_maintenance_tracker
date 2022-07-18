@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:current_location/utilities/file_controller.dart';
+import 'package:current_location/utilities/services/file_controller.dart';
 
 class CarHistory extends StatefulWidget {
   static const routeName = '/screens/car_history';
@@ -62,7 +62,7 @@ class _CarHistoryState extends State<CarHistory> {
                     title: Text(
                         'Maintenance: ${fileController.car.serviceList[index].serviceName}'),
                     subtitle: fileController.car.serviceList[index].hasBeenDone
-                        ? Text('Car Mileage: ${fileController.car.carMileage}')
+                        ? Text('Car Mileage: ${fileController.car.currentMileage}')
                         : const Text('Not Repaired Yet'),
                     trailing: fileController.car.serviceList[index].hasBeenDone
                         ? const Icon(Icons.done_outline_sharp,

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utilities/dataObject/car.dart';
-import '../utilities/file_controller.dart';
-import '../utilities/file_manager.dart';
+import '../utilities/services/file_controller.dart';
+import '../utilities/services/file_manager.dart';
 import 'main_screen.dart';
 
 
@@ -33,7 +33,8 @@ class _EditCarInfoState extends State<EditCarInfo> {
     final car = Car(
       bluetoothAddress: _bluetoothAddress,
       carCompany: _carCompany.text,
-      carMileage: _carName.text,
+      currentMileage: 10,
+      // currentMileage: double.parse(_carName.text),
       carName: _carName.text,
       carYear: _carYear.text,
       tripsInfo: [],
@@ -94,6 +95,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
                 ),
               ),
               TextFormField(
+                keyboardType: TextInputType.number,
                 controller: _carMileage,
                 decoration: const InputDecoration(
                   label: Text('Car Mileage'),

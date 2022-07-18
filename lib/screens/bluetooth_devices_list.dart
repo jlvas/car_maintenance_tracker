@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:current_location/screens/edit_car_info.dart';
-import 'package:current_location/utilities/display_message.dart';
+import 'package:current_location/utilities/services/display_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 

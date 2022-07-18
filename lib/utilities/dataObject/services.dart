@@ -1,15 +1,17 @@
 class Services{
   final String time;
   final String serviceName;
-  final String mileage;
+  final double periodicMileage;
+  double realMileage;
   bool hasBeenDone;
-  Services({required this.serviceName, required this.mileage, this.hasBeenDone =false, this.time = '', });
+
+  Services({required this.serviceName, required this.periodicMileage, this.hasBeenDone =false, this.time = '', this.realMileage = 0, });
 
   factory Services.fromJson( Map<String, dynamic> json){
     return Services(
       time: json['time'],
       serviceName: json['serviceName'],
-      mileage: json['mileage'],
+      periodicMileage: json['periodicMileage'],
       hasBeenDone: json['hasBeenDone'],
     );
   }
@@ -18,7 +20,7 @@ class Services{
     return {
       'time': time,
       'serviceName': serviceName,
-      'mileage': mileage,
+      'periodicMileage': periodicMileage,
       'hasBeenDone': hasBeenDone,
     };
   }

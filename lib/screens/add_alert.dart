@@ -1,8 +1,9 @@
-import 'package:current_location/utilities/file_controller.dart';
+import 'package:current_location/utilities/services/file_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../utilities/dataObject/services.dart';
+import '../utilities/services/local_notifications.dart';
 class AddAlert extends StatefulWidget {
 
   static const routeName = '/screens/add_alert';
@@ -60,8 +61,20 @@ class _AddAlertState extends State<AddAlert> {
               ElevatedButton(
                 onPressed: (){
                   if(_key.currentState!.validate()){
-                    fileController.car.serviceList.add(Services(serviceName: _serviceName.text, time: '', mileage: _mileage.text,));
+                    final services =  Services(
+                      serviceName: _serviceName.text,
+                      time: '',
+                      periodicMileage: double.parse(_mileage.text),
+                      realMileage: double.parse(_mileage.text) + fileController.car.currentMileage,
+                    );
+                    fileController.car.serviceList.add(services);
                     fileController.write();
+                    LocalNotifications.showNotification(
+                      id: fileController.car.serviceList.length+1,
+                      title: _serviceName.text,
+                      body: 'Maintenance after: ${services.realMileage}',
+                      payload: 'payload'
+                    );
                     Navigator.pop(context);
                   }
                 },

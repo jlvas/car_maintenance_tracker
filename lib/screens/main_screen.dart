@@ -1,9 +1,9 @@
-import 'package:current_location/utilities/file_controller.dart';
+import 'package:current_location/utilities/services/file_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer';
 
-import '../utilities/file_manager.dart';
+import '../utilities/services/file_manager.dart';
 import 'bluetooth_devices_list.dart';
 import 'car_tracking.dart';
 
@@ -16,8 +16,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  @override
+
+  late FileController fileController;
+
+@override
   Widget build(BuildContext context) {
+
     return FutureBuilder(
       future: FileManager().readFromFileCar(),
       builder: (ctx, dataSnap) {

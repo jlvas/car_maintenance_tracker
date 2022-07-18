@@ -9,7 +9,7 @@ class Car{
   final String carName;
   final String carYear;
   final String carCompany;
-  final String carMileage;
+  double currentMileage;
   final List<TripsInfo> tripsInfo;
   final List<Services> serviceList;
 
@@ -18,7 +18,7 @@ class Car{
       required this.carName,
       required this.carYear,
       required this.carCompany,
-      required this.carMileage,
+      required this.currentMileage,
       required this.tripsInfo,
       required this.serviceList});
 
@@ -27,7 +27,7 @@ class Car{
     carName: json['carName'] ,
     carYear: json['carYear'],
     carCompany: json['carCompany'],
-    carMileage: json['carMileage'],
+    currentMileage: json['currentMileage'],
     tripsInfo: (json['tripsInfo'] as List<dynamic>)
         .map((e) => TripsInfo.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -42,7 +42,7 @@ class Car{
         'carName':carName,
         'carYear':carYear,
         'carCompany': carCompany,
-        'carMileage': carMileage,
+        'currentMileage': currentMileage,
         'tripsInfo': tripsInfo.map((e) => e.toJson()).toList(),
         'serviceList':serviceList.map((e) => e.toJson()).toList(),
       };

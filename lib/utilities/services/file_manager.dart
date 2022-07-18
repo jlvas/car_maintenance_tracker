@@ -3,7 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:developer';
 
-import 'dataObject/car.dart';
+import '../dataObject/car.dart';
 
 class FileManager {
   static final FileManager _fileManager = FileManager._internal();

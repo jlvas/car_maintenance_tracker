@@ -4,15 +4,15 @@ import 'dart:math';
 import 'dart:developer' as developer;
 
 import 'package:current_location/utilities/dataObject/trips_info.dart';
-import 'package:current_location/utilities/file_controller.dart';
+import 'package:current_location/utilities/services/file_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
-import '../utilities/file_manager.dart';
-import '../utilities/display_message.dart';
+import '../utilities/services/file_manager.dart';
+import '../utilities/services/display_message.dart';
 import 'trip_list.dart';
 
 class CarTracking extends StatefulWidget {
@@ -27,7 +27,6 @@ class CarTracking extends StatefulWidget {
 class _CarTrackingState extends State<CarTracking> {
   String? longitude;
   String? latitude;
-  List<LatLng> _coordinates = [];
   List<BluetoothDevice> deviceList = [];
   GoogleMapController? _googleMapController;
   Set<Marker> markers = Set();
@@ -63,7 +62,7 @@ class _CarTrackingState extends State<CarTracking> {
   void _gpsStreamRecorder() {
 
     StreamSubscription? streamLocation;
-    BluetoothDevice? bDevice;
+    BluetoothDevice bDevice;
     bool isConnected = false;
     ///TripInfo properties
     List<LatLng> trip = [];
@@ -74,12 +73,17 @@ class _CarTrackingState extends State<CarTracking> {
     /// if there is a connection then keep recording the coordinates
     /// else navigate to trip_list
     Timer.periodic(const Duration(seconds: 1), (timer) async {
-      FlutterBluetoothSerial.instance.getBondedDevices().then((value) {
-        return bDevice = value.where((element) {
-          return element.address == fileController.car.bluetoothAddress;
-        }).first;
+      final list = await FlutterBluetoothSerial.instance.getBondedDevices();
+      bDevice = list.firstWhere((element) {
+        return element.address == fileController.car.bluetoothAddress;
       });
-      if (!bDevice!.isConnected) {
+      // FlutterBluetoothSerial.instance.getBondedDevices().then((value) {
+      //   return bDevice = value.where((element) {
+      //     return element.address == fileController.car.bluetoothAddress;
+      //   }).first;
+      // });
+      if (!bDevice.isConnected) {
+        developer.log('is not connected');
         isConnected = false;
         streamLocation?.cancel();
         timer.cancel();

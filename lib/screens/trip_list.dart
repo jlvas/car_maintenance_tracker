@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../utilities/dataObject/trips_info.dart';
-import '../utilities/file_controller.dart';
-import '../utilities/file_manager.dart';
+import '../utilities/services/file_controller.dart';
+import '../utilities/services/file_manager.dart';
 import 'add_alert.dart';
 
 class TripList extends StatefulWidget {
