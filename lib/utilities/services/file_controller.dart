@@ -1,36 +1,23 @@
 import 'dart:convert';
-
 import 'package:current_location/utilities/services/file_manager.dart';
-import 'package:flutter/foundation.dart';
-
 import '../dataObject/car.dart';
 
-class FileController extends ChangeNotifier {
+class FileController{
 
-  static late Car _car;
-  static String _text = 'data';
 
-  FileController(){
-    readCar();
+  Future<String> readFile()async{
+    final text;
+    text = await FileManager().readFromFileCar();
+    return text;
   }
-  Car get car => _car;
-  String get text => _text;
-
-  Future<String> readCar()async{
-    _text = await FileManager().readFromFileCar();
-    if(_text != 'data'){
-      _car = Car.fromJson(jsonDecode(_text));
-    }
-    return'test';
-  }
-  writeCar(Car car) async {
-    _car = car;
+  Future<String> writeFile(Car car) async {
     await FileManager().writeCarToFile(car);
-    notifyListeners();
+    return json.encode(car.toString());
+
   }
 
-  write() async {
-    await FileManager().writeCarToFile(_car);
-    notifyListeners();
+  Future<String> writFileNotifier(Car car) async {
+    await FileManager().writeCarToFile(car);
+    return  json.encode(car.toJson());
   }
 }

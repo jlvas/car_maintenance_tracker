@@ -1,51 +1,44 @@
 import 'dart:convert';
 
+import 'package:current_location/main.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../utilities/dataObject/car.dart';
 import '../utilities/services/file_controller.dart';
-import '../utilities/services/file_manager.dart';
-import 'main_screen.dart';
 
-
-
-class EditCarInfo extends StatefulWidget {
+class EditCarInfo extends StatelessWidget {
   static const routeName = '/screens/edit_car_info';
-  const EditCarInfo({Key? key}) : super(key: key);
-
-  @override
-  _EditCarInfoState createState() => _EditCarInfoState();
-}
-
-class _EditCarInfoState extends State<EditCarInfo> {
+//   const EditCarInfo({Key? key}) : super(key: key);
+//
+//   @override
+//   _EditCarInfoState createState() => _EditCarInfoState();
+// }
+//
+// class _EditCarInfoState extends State<EditCarInfo> {
 
   final _key = GlobalKey<FormState>();
-  late String _bluetoothAddress;
   final TextEditingController _carName = TextEditingController();
   final TextEditingController _carCompany = TextEditingController();
   final TextEditingController _carYear = TextEditingController();
   final TextEditingController _carMileage = TextEditingController();
 
-  late FileController fileController;
-
-  Future<void> _submitCarInfo() async{
+  Future<void> _submitCarInfo(String bluetoothAddress, BuildContext context) async{
 
     final car = Car(
-      bluetoothAddress: _bluetoothAddress,
+      bluetoothAddress: bluetoothAddress,
       carCompany: _carCompany.text,
-      currentMileage: 10,
+      currentMileage: double.parse(_carMileage.text),
       // currentMileage: double.parse(_carName.text),
       carName: _carName.text,
-      carYear: _carYear.text,
+      carYear: int.parse(_carYear.text),
       tripsInfo: [],
       serviceList: [],
     );
-    fileController.writeCar(car);// using change notifier provider
+    FileController().writeFile(car);// using change notifier provider
     // await FileManager().writeCarToFile(car);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => MainScreen(),
+        builder: (BuildContext context) => MyApp(),
       ),
           (route) => false,
     );
@@ -55,9 +48,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
   @override
   Widget build(BuildContext context) {
 
-    _bluetoothAddress = ModalRoute.of(context)!.settings.arguments as String;
-    fileController = Provider.of<FileController>(context);
-
+    final bluetoothAddress = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar:AppBar(
         title: const Text('Edit Car Info'),
@@ -89,6 +80,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
                 height: 10,
               ),
               TextFormField(
+                keyboardType: TextInputType.number,
                 controller: _carYear,
                 decoration: const InputDecoration(
                   label: Text('Year Of Made')
@@ -105,7 +97,7 @@ class _EditCarInfoState extends State<EditCarInfo> {
                 height: 10,
               ),
               ElevatedButton(
-                onPressed: _submitCarInfo,
+                onPressed: ()=> _submitCarInfo(bluetoothAddress, context),
                 child: const Text('Submit')
               ),
             ],

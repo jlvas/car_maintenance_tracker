@@ -1,24 +1,22 @@
-import 'dart:convert';
 import 'dart:developer';
 
-import 'package:current_location/screens/alert_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import '../utilities/dataObject/trips_info.dart';
-import '../utilities/services/file_controller.dart';
-import '../utilities/services/file_manager.dart';
+
+import 'package:current_location/screens/alert_list.dart';
+import '../utilities/dataObject/car.dart';
 import 'add_alert.dart';
 
-class TripList extends StatefulWidget {
+class TripList extends StatelessWidget {
   static const routeName = '/screens/trip_list';
-  const TripList({Key? key}) : super(key: key);
-
-  @override
-  State<TripList> createState() => _TripListState();
-}
-
-class _TripListState extends State<TripList> {
+//   const TripList({Key? key}) : super(key: key);
+//
+//   @override
+//   State<TripList> createState() => _TripListState();
+// }
+//
+// class _TripListState extends State<TripList> {
 
   GoogleMapController? _googleMapController;
   Set<Marker> markers = Set();
@@ -27,12 +25,12 @@ class _TripListState extends State<TripList> {
   LatLng startLocation = const LatLng(26.4568748, 50.0542238);
   LatLng endLocation = const LatLng(26.4568894, 50.0541741);
   Map<PolylineId, Polyline> polylines = {};
-  // late Car car;
-  late FileController fileController;
 
   @override
   Widget build(BuildContext context){
-    fileController = Provider.of<FileController>(context);
+    log('before provider');
+    final car = Provider.of<Car>(context);
+    log('after provider');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trip List'),
@@ -58,11 +56,12 @@ class _TripListState extends State<TripList> {
           )
         ],
       ),
-      body: _tripList(),
+      body: _tripList(car),
     );
   }
 
-  void _onSelectedMenu(BuildContext context, int item){
+  void _onSelectedMenu(BuildContext context, int item)
+  {
     switch(item) {
       case 0:
         print('pressed on value 0');
@@ -75,31 +74,7 @@ class _TripListState extends State<TripList> {
         break;
     }
   }
-  FutureBuilder<String> buildFutureBuilder() {
-    return FutureBuilder<String>(
-      future: _initialize(),
-      builder: (context, snapShat){
-        if(snapShat.hasData){
-          if(snapShat.data == 'data'){
-            return const Text('has data');
-          }else{
-            return _tripList();
-          }
-        }
-        else if(snapShat.connectionState == ConnectionState.waiting){
-          return const Text('Waiting');
-        }
-        else if(snapShat.hasError){
-          return Text('Error: ${snapShat.hasError}\n${snapShat.error}');
-        }
-        else{
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
-  }
+
 
   void _addPolyLine(List<LatLng> polylineCoordinates) {
     PolylineId id = const PolylineId("poly");
@@ -112,12 +87,12 @@ class _TripListState extends State<TripList> {
     polylines[id] = polyline;
   }
 
-  Widget _tripList(){
+  Widget _tripList(Car car){
 
     return ListView.builder(
-      itemCount:fileController.car.tripsInfo.length,
+      itemCount: car.tripsInfo.length,
       itemBuilder: ((_, index){
-        _addPolyLine(fileController.car.tripsInfo[index].trip);
+        _addPolyLine(car.tripsInfo[index].trip);
         return SizedBox(
           height: 400,
           child: Container(
@@ -134,18 +109,18 @@ class _TripListState extends State<TripList> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Trip Time: ${fileController.car.tripsInfo[index].time}'),
+                  child: Text('Trip Time: ${car.tripsInfo[index].time}'),
                 ),
                 Divider(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Total Distance: ${fileController.car.tripsInfo[index].totalDistance} km'),
+                  child: Text('Total Distance: ${car.tripsInfo[index].totalDistance} km'),
                 ),
                 Divider(),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: _googleMap(fileController.car.tripsInfo[index].trip),
+                    child: _googleMap(car.tripsInfo[index].trip),
                   ),
                 ),
               ],
@@ -154,23 +129,6 @@ class _TripListState extends State<TripList> {
         );
       }),
     );
-  }
-
-  Future<String> _initialize() async{
-    log('_initialize()');
-    String contentCar = await FileManager().readFromFileCar();
-    log(contentCar.toString());
-    if( contentCar == 'data'){
-      log('_initialize: $contentCar');
-      return contentCar;
-    }else{
-
-      // car = Car.fromJson(json.decode(contentCar));
-
-      log('_initialize\n$contentCar');
-
-      return contentCar;
-    }
   }
 
   Widget _googleMap(List<LatLng> trip){
@@ -189,15 +147,15 @@ class _TripListState extends State<TripList> {
         //map type
         polylines: Set<Polyline>.of(polylines.values),
         onMapCreated: (controller) {
-          setState(() {
-            _googleMapController = controller;
-          });
+          // setState(() {
+          //   _googleMapController = controller;
+          // });
         },
       );
   }
 
   void _setMarkersCurrentLocation(LatLng currentLocation) {
-    setState(() {
+    // setState(() {
       markers.add(Marker(
         markerId: MarkerId(currentLocation.toString()),
         position: currentLocation,
@@ -207,7 +165,7 @@ class _TripListState extends State<TripList> {
         ),
         icon: BitmapDescriptor.defaultMarker,
       ));
-    });
+    // });
   }
 
   void _setStartMarker(List<LatLng> list) {

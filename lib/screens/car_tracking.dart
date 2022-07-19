@@ -4,27 +4,25 @@ import 'dart:math';
 import 'dart:developer' as developer;
 
 import 'package:current_location/utilities/dataObject/trips_info.dart';
-import 'package:current_location/utilities/services/file_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
-import '../utilities/services/file_manager.dart';
-import '../utilities/services/display_message.dart';
+import '../utilities/dataObject/car.dart';
 import 'trip_list.dart';
 
-class CarTracking extends StatefulWidget {
+class CarTracking extends StatelessWidget {
   static const routeName = '/screens/car_tracking';
 
-  const CarTracking({Key? key}) : super(key: key);
-
-  @override
-  State<CarTracking> createState() => _CarTrackingState();
-}
-
-class _CarTrackingState extends State<CarTracking> {
+//   const CarTracking({Key? key}) : super(key: key);
+//
+//   @override
+//   State<CarTracking> createState() => _CarTrackingState();
+// }
+//
+// class _CarTrackingState extends State<CarTracking> {
   String? longitude;
   String? latitude;
   List<BluetoothDevice> deviceList = [];
@@ -36,21 +34,19 @@ class _CarTrackingState extends State<CarTracking> {
   LatLng endLocation = const LatLng(26.4568894, 50.0541741);
   Map<PolylineId, Polyline> polylines = {};
 
-  late FileController fileController;
-
   @override
   void initState() {
     Location().enableBackgroundMode(enable: true);
-    _gpsStreamRecorder();
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    fileController = Provider.of<FileController>(context, listen: false);
+    final car = Provider.of<Car>(context, listen: false);
+    _gpsStreamRecorder(context, car);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Live Location'),
+        title: const Text('Car Tracking'),
       ),
       body: _interfaceWidget(),
     );
@@ -59,7 +55,7 @@ class _CarTrackingState extends State<CarTracking> {
   ///_gpsStreamRecorder: a function get gps coordinates when device is connected with chosen specific bluetooth.
   ///Contains: two streams; one to listen for bluetooth connection and second one is to write down the GPS coordinates.
   ///Data is stored on CarInfo and then will be written on json file.
-  void _gpsStreamRecorder() {
+  void _gpsStreamRecorder(BuildContext context, Car car) {
 
     StreamSubscription? streamLocation;
     BluetoothDevice bDevice;
@@ -75,7 +71,7 @@ class _CarTrackingState extends State<CarTracking> {
     Timer.periodic(const Duration(seconds: 1), (timer) async {
       final list = await FlutterBluetoothSerial.instance.getBondedDevices();
       bDevice = list.firstWhere((element) {
-        return element.address == fileController.car.bluetoothAddress;
+        return element.address == car.bluetoothAddress;
       });
       // FlutterBluetoothSerial.instance.getBondedDevices().then((value) {
       //   return bDevice = value.where((element) {
@@ -89,8 +85,8 @@ class _CarTrackingState extends State<CarTracking> {
         timer.cancel();
         totalDistance = _getDistance(trip).toString();
         if(trip.isNotEmpty){
-          fileController.car.tripsInfo.add(TripsInfo(trip: trip, time: time, totalDistance: totalDistance));
-          fileController.write();
+          car.tripsInfo.add(TripsInfo(trip: trip, time: time, totalDistance: totalDistance));
+          car.writeFile(car);
           Navigator.pushNamedAndRemoveUntil(context, TripList.routeName, (route) => false);
         }else{
           Navigator.pushNamedAndRemoveUntil(context, TripList.routeName, (route) => false);
@@ -103,7 +99,9 @@ class _CarTrackingState extends State<CarTracking> {
     streamLocation = Location().onLocationChanged.listen((lnglat) {
       LatLng coordinate =
       LatLng(lnglat.latitude!.toDouble(), lnglat.longitude!.toDouble());
-      if(isConnected) trip.add(coordinate);
+      if(isConnected) {
+        trip.add(coordinate);
+      }
       developer.log('\ncoordinates added: $coordinate');
     });
   }
@@ -166,9 +164,9 @@ class _CarTrackingState extends State<CarTracking> {
                 //map type
                 polylines: Set<Polyline>.of(polylines.values),
                 onMapCreated: (controller) {
-                  setState(() {
-                    _googleMapController = controller;
-                  });
+                  // setState(() {
+                  //   _googleMapController = controller;
+                  // });
                 },
               ),
             ),

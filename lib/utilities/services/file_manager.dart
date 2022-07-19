@@ -19,53 +19,14 @@ class FileManager {
     return directory.path;
   }
 
-  Future<File> get _file async{
-    final path = await directoryPath;
-    return File('$path/carInfoStorage.txt');
-  }
   Future<File> get _fileCar async{
     final path = await directoryPath;
     return File('$path/tripCar.txt');
   }
 
-  // Future<void> writeToFileLocationInfo (LocationInfo locationInfo) async{
-  //   try{
-  //     final file = await _file;
-  //     await file.writeAsString(
-  //       json.encode(locationInfo.toJson())+'\n',
-  //       mode: FileMode.append,
-  //       encoding: utf8,
-  //       flush: false,
-  //     );
-  //   }
-  //   catch (e){
-  //     print('Error $e');
-  //     throw e;
-  //   }
-  // }
-
-  Future<String> readFromFile() async {
-    log('FileManager.readFromFile');
-    File file = await _file;
-    String contents = 'data';
-    // log('\nFileManager\nreadFromFile()\n $contents');
-    if(await file.exists()){
-      log('File Exist: ${await file.exists()}');
-      try{
-        contents = await file.readAsString();
-        // log('Inside Try: \n$contents');
-        final Map<String, dynamic> valueMap = json.decode(contents);
-      }
-      catch(e){
-        throw e;
-      }
-    }else{
-      log('\nFileManager\n readFromFileCarInfo()\n Error file does not exist');
-    }
-    return contents;
-  }
 
   Future<String> readFromFileCar() async {
+    log('FileManager.readFromFileCar');
     String contents = 'data';
     File file = await _fileCar;
     if(await file.exists()){
@@ -94,10 +55,5 @@ class FileManager {
       log('FileManager.writeToFileCarInfo.error\n $e');
       throw e;
     }
-  }
-
-  Future<bool> fileExist() async{
-    File file = await _file;
-    return await file.exists();
   }
 }

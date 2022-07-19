@@ -1,17 +1,18 @@
-import 'dart:developer';
+import 'package:flutter/material.dart';
 
 import 'package:current_location/utilities/dataObject/trips_info.dart';
+import 'package:current_location/utilities/services/file_manager.dart';
 import 'services.dart';
 
-class Car{
+class Car with ChangeNotifier{
 
-  final String bluetoothAddress;
-  final String carName;
-  final String carYear;
-  final String carCompany;
+  String bluetoothAddress;
+  String carName;
+  int carYear;
+  String carCompany;
   double currentMileage;
-  final List<TripsInfo> tripsInfo;
-  final List<Services> serviceList;
+  List<TripsInfo> tripsInfo;
+  List<Services> serviceList;
 
 
   Car({required this.bluetoothAddress,
@@ -36,8 +37,8 @@ class Car{
         .toList(),
   );
 
-  Map<String,dynamic> toJson()=>
-      {
+  Map<String,dynamic> toJson() {
+    return {
         'bluetoothAddress': bluetoothAddress,
         'carName':carName,
         'carYear':carYear,
@@ -46,4 +47,11 @@ class Car{
         'tripsInfo': tripsInfo.map((e) => e.toJson()).toList(),
         'serviceList':serviceList.map((e) => e.toJson()).toList(),
       };
+  }
+
+
+  writeFile(Car car){
+    FileManager().writeCarToFile(car);
+    notifyListeners();
+  }
 }
